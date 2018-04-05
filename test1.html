@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - OBJLoader + MTLLoader</title>
+		<title>h5 games for dxj</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="stylesheet" type="text/css" href="css/demo.css" />
@@ -10,7 +10,7 @@
 		<style>
 			body {
 				font-family: Monospace;
-				background-color: #000;
+				/* background-color: #000; */
 				color: #fff;
 				margin: 0px;
 				overflow: hidden;
@@ -33,7 +33,7 @@
 			<div class="header">
 				<div class="score" id="score">
 					<div class="score__content" id="level">
-						<div class="score__label">level</div>
+						<div class="score__label">关数</div>
 						<div class="score__value score__value--level" id="levelValue">1</div>
 						<svg class="level-circle" id="levelCircle" viewbox="0 0 200 200">
 								<circle id="levelCircleBgr" r="80" cx="100" cy="100" fill="none" stroke="#d1b790" stroke-width="24px" />
@@ -41,11 +41,11 @@
 							</svg>
 					</div>
 					<div class="score__content" id="dist">
-						<div class="score__label">distance</div>
+						<div class="score__label">飞行距离</div>
 						<div class="score__value score__value--dist" id="distValue">000</div>
 					</div>
 					<div class="score__content" id="energy">
-						<div class="score__label">energy</div>
+						<div class="score__label">剩余能量</div>
 						<div class="score__value score__value--energy" id="energyValue">
 							<div class="energy-bar" id="energyBar"></div>
 						</div>
@@ -53,8 +53,8 @@
 				</div>
 			</div>
 			<div class="world" id="world"></div>
-			<div class="message message--replay" id="replayMessage">Click to Replay</div>
-			<div class="message message--instructions" id="instructions">Grab the blue pills<span>avoid the red ones</span></div>
+			<div class="message message--replay" id="replayMessage">再来一局</div>
+			<div class="message message--instructions" id="instructions">蓝色的补充能量<span>红色减少能量</span></div>
 		</div>
 		<script src="js/three.js"></script>
 

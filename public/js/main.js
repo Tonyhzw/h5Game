@@ -1,3 +1,4 @@
+// 参数配置
 //COLORS
 var Colors = {
     red:0xf25346,
@@ -21,7 +22,7 @@ var oldTime = new Date().getTime();
 var ennemiesPool = [];
 var particlesPool = [];
 var particlesInUse = [];
-
+// 设置游戏初始化参数
 function resetGame(){
   game = {speed:0,
           initSpeed:.00035,
@@ -41,29 +42,23 @@ function resetGame(){
           levelLastUpdate:0,
           distanceForLevelUpdate:1000,
 
-          planeDefaultHeight:300,
-          planeAmpHeight:80,
-          planeAmpWidth:75,
-          planeMoveSensivity:0.005,
-          planeRotXSensivity:0.0008,
-          planeRotZSensivity:0.0004,
-          planeFallSpeed:.001,
-          planeMinSpeed:1.2,
-          planeMaxSpeed:1.6,
-          planeSpeed:0,
-          planeCollisionDisplacementX:0,
-          planeCollisionSpeedX:0,
+          modelDefaultHeight:300,
+          modelAmpHeight:80,
+          modelAmpWidth:75,
+          modelMoveSensivity:0.005,
+          modelRotXSensivity:0.0008,
+          modelRotZSensivity:0.0004,
+          modelFallSpeed:.001,
+          modelMinSpeed:1.2,
+          modelMaxSpeed:1.6,
+          modelSpeed:0,
+          modelCollisionDisplacementX:0,
+          modelCollisionSpeedX:0,
 
-          planeCollisionDisplacementY:0,
-          planeCollisionSpeedY:0,
+          modelCollisionDisplacementY:0,
+          modelCollisionSpeedY:0,
 
           seaRadius:100,
-          //seaLength:800,
-          //seaRotationSpeed:0.006,
-          //wavesMinAmp : 5,
-          //wavesMaxAmp : 20,
-          //wavesMinSpeed : 0.001,
-          //wavesMaxSpeed : 0.003,
 
           cameraFarPos:500,
           cameraNearPos:150,
@@ -83,13 +78,14 @@ function resetGame(){
 
           status : "playing",
          };
+  if(ambientLight) ambientLight.intensity = 0.5;
   fieldLevel.innerHTML = Math.floor(game.level);
 }
 
 //THREEJS RELATED VARIABLES
 
 var scene,
-    camera, fieldOfView, aspectRatio, nearPlane, farPlane,
+    camera, fieldOfView, aspectRatio, nearmodel, farmodel,
     renderer,
     container,
     controls;
@@ -109,19 +105,19 @@ function createScene() {
   scene = new THREE.Scene();
   aspectRatio = WIDTH / HEIGHT;
   fieldOfView = 50;
-  nearPlane = .1;
-  farPlane = 10000;
+  nearmodel = .1;
+  farmodel = 10000;
   camera = new THREE.PerspectiveCamera(
     fieldOfView,
     aspectRatio,
-    nearPlane,
-    farPlane
+    nearmodel,
+    farmodel
     );
   scene.fog = new THREE.Fog(0xf7d9aa, 100,950);
   camera.position.x = 0;
   camera.position.z = 200;
-  camera.position.y = game.planeDefaultHeight;
-  camera.lookAt(new THREE.Vector3(0, game.planeDefaultHeight, 200));
+  camera.position.y = game.modelDefaultHeight;
+  camera.lookAt(new THREE.Vector3(0, game.modelDefaultHeight, 200));
 
   renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setSize(WIDTH, HEIGHT);
@@ -133,14 +129,7 @@ function createScene() {
 
   window.addEventListener('resize', handleWindowResize, false);
 
-  /*
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.minPolarAngle = -Math.PI / 2;
-  controls.maxPolarAngle = Math.PI ;
 
-  //controls.noZoom = true;
-  //controls.noPan = true;
-  //*/
 }
 
 // MOUSE AND SCREEN EVENTS
@@ -181,7 +170,7 @@ function handleTouchEnd(event){
   }
 }
 
-// LIGHTS
+// 灯光效果 环境光  半球光  平行光
 
 var ambientLight, hemisphereLight, shadowLight;
 
@@ -203,7 +192,7 @@ function createLights() {
   shadowLight.shadow.mapSize.width = 4096;
   shadowLight.shadow.mapSize.height = 4096;
 
-  var ch = new THREE.CameraHelper(shadowLight.shadow.camera);
+  //var ch = new THREE.CameraHelper(shadowLight.shadow.camera);
 
   //scene.add(ch);
   scene.add(hemisphereLight);
@@ -211,83 +200,6 @@ function createLights() {
   scene.add(ambientLight);
 
 }
-/*
-function init() {
-
-    container = document.createElement('div');
-    document.body.appendChild(container);
-
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 100, 10000);
-    //camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 10, 5000 );
-    //camera.position.x =5000;
-    camera.position.y = 0;
-    camera.position.z = -1000;
-    camera.lookAt({
-        x: 0,
-        y: 0,
-        z: 1000
-    });
-
-    scene = new THREE.Scene();
-  //  scene.fog = new THREE.Fog(0xf7d9aa, 100,950);
-
-    // var ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
-    // scene.add(ambientLight);
-    //
-    // var pointLight = new THREE.PointLight(0xffffff, 0.4);
-    // camera.add(pointLight);
-
-    scene.add(camera);
-
-    //light
-    createLights();
-    //create model
-    var promiseModel = resourceFectch('source/model2.mtl', 'source/model2.obj');
-    promiseModel.then(function(object) {
-        //object.position.x = 200;
-        //object.position.y = -300;
-        object.position.z = -200;
-        object.rotation.
-        scene.add(object);
-        model = object;
-    });
-    var promiseEnvironment = resourceFectch('resource/environment.mtl', 'resource/environment.obj');
-    promiseEnvironment.then(function(object) {
-        object.position.y = -300;
-        object.position.z = -600;
-        scene.add(object);
-        environment = object;
-    });
-    // Promise.all([promiseModal, promiseEnvironment]).then(function(values) {
-    //     console.log(values);
-    //     values.forEach(function(value) {
-    //         scene.add(value);
-    //     })
-    // });
-
-    //createCoins();
-    //createEnnemies();
-    //createParticles();
-
-    THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
-
-
-
-
-    renderer = new THREE.WebGLRenderer();
-    renderer.shadowMap.enabled = true;
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    container.appendChild(renderer.domElement);
-
-    document.addEventListener('mousemove', onDocumentMouseMove, false);
-
-    window.addEventListener('resize', onWindowResize, false);
-
-    clock = new THREE.Clock();
-
-}
-*/
 
 function resourceFectch(mtlStr, objStr) {
     var mtlLoader = new THREE.MTLLoader();
@@ -315,40 +227,33 @@ function resourceFectch(mtlStr, objStr) {
         });
     });
 }
-//3d model3
+
+//3d model3  小人、地球
 
 var model, environment;
-
+//加载模型
 function createModelAndEnvironment(){
   var promiseModel = resourceFectch('resource/modelFly.mtl', 'resource/modelFly.obj');
   var promiseEnvironment = resourceFectch('resource/environment.mtl', 'resource/environment.obj');
   Promise.all([promiseModel, promiseEnvironment]).then(function(values) {
      console.log(values);
      model = values[0];
-     //console.log(1,model.position.y,model.position.z);
-     //model.rotation.y = Math.PI;
-     //console.log(2,model.position.y,model.position.z);
-     //model.rotation.z = Math.PI;
-     //console.log(3,model.position.y,model.position.z);
      model.scale.set(.1,.1,.1);
-     //model.position.x *= -1;
-     //console.log(4,model.position.y,model.position.z);
      model.castShadow = true;
      model.receiveShadow = true;
      scene.add(model);
-     //model.rotation.x-=Math.PI/2*3;
 
      environment = values[1];
-     environment.scale.set(.35,.35,.35);
-     environment.position.y = game.planeDefaultHeight -200;
+     environment.scale.set(.5,.5,.5);
+     environment.position.y = game.modelDefaultHeight -200;
      environment.position.z = -10;
      scene.add(environment);
 
-     //create other things
+     //创建金币、障碍物、障碍物分解物
      createCoins();
      createEnnemies();
      createParticles();
-
+     //循环游戏
      loop();
  });
 }
@@ -383,7 +288,7 @@ EnnemiesHolder.prototype.spawnEnnemies = function(){
     }
 
     ennemy.angle = - (i*0.1);
-    ennemy.distance = game.seaRadius + game.planeDefaultHeight + (-1 + Math.random() * 2) * (game.planeAmpHeight-20);
+    ennemy.distance = game.seaRadius + game.modelDefaultHeight + (-1 + Math.random() * 2) * (game.modelAmpHeight-20);
     ennemy.mesh.position.y = -game.seaRadius + Math.sin(ennemy.angle)*ennemy.distance;
     ennemy.mesh.position.x = Math.cos(ennemy.angle)*ennemy.distance;
 
@@ -412,9 +317,9 @@ EnnemiesHolder.prototype.rotateEnnemies = function(){
 
       ennemiesPool.unshift(this.ennemiesInUse.splice(i,1)[0]);
       this.mesh.remove(ennemy.mesh);
-      game.planeCollisionSpeedX = 100 * diffPos.x / d;
-      game.planeCollisionSpeedY = 100 * diffPos.y / d;
-      ambientLight.intensity = 2;
+      game.modelCollisionSpeedX = 100 * diffPos.x / d;
+      game.modelCollisionSpeedY = 100 * diffPos.y / d;
+      //ambientLight.intensity = 1;
 
       removeEnergy();
       i--;
@@ -507,7 +412,7 @@ CoinsHolder = function (nCoins){
 CoinsHolder.prototype.spawnCoins = function(){
 
   var nCoins = 1 + Math.floor(Math.random()*10);
-  var d = game.seaRadius + game.planeDefaultHeight + (-1 + Math.random() * 2) * (game.planeAmpHeight-20);
+  var d = game.seaRadius + game.modelDefaultHeight + (-1 + Math.random() * 2) * (game.modelAmpHeight-20);
   var amplitude = 10 + Math.round(Math.random()*10);
   for (var i=0; i<nCoins; i++){
     var coin;
@@ -578,7 +483,7 @@ function createParticles(){
   //ennemiesHolder.mesh.position.y = -game.seaRadius;
   scene.add(particlesHolder.mesh)
 }
-
+//循环，游戏
 function loop(){
 
   newTime = new Date().getTime();
@@ -620,14 +525,14 @@ function loop(){
     updateDistance();
     updateEnergy();
     game.baseSpeed += (game.targetBaseSpeed - game.baseSpeed) * deltaTime * 0.02;
-    game.speed = game.baseSpeed * game.planeSpeed;
+    game.speed = game.baseSpeed * game.modelSpeed;
 
   }else if(game.status=="gameover"){
     game.speed *= .99;
     model.rotation.z += (-Math.PI/2 - model.rotation.z)*.0002*deltaTime;
     model.rotation.x += 0.0003*deltaTime;
-    game.planeFallSpeed *= 1.05;
-    model.position.y -= game.planeFallSpeed*deltaTime;
+    game.modelFallSpeed *= 1.05;
+    model.position.y -= game.modelFallSpeed*deltaTime;
 
     if (model.position.y <-200){
       showReplay();
@@ -637,35 +542,23 @@ function loop(){
   }else if (game.status=="waitingReplay"){
 
   }
-
-
-  //model.propeller.rotation.x +=.2 + game.planeSpeed * deltaTime*.005;
-  //sea.mesh.rotation.z += game.speed*deltaTime;//*game.seaRotationSpeed;
-
-  //if ( sea.mesh.rotation.z > 2*Math.PI)  sea.mesh.rotation.z -= 2*Math.PI;
-
-  ambientLight.intensity += (.5 - ambientLight.intensity)*deltaTime*0.005;
-
+  //ambientLight.intensity += (.5 - ambientLight.intensity)*deltaTime*0.005;
   coinsHolder.rotateCoins();
   ennemiesHolder.rotateEnnemies();
-
-  //sky.moveClouds();
-  //sea.moveWaves();
-
+  ambientLight.intensity-=0.0002;
   renderer.render(scene, camera);
   requestAnimationFrame(loop);
 }
-
+//更新距离，并显示
 function updateDistance(){
   game.distance += game.speed*deltaTime*game.ratioSpeedDistance;
   fieldDistance.innerHTML = Math.floor(game.distance);
   var d = 502*(1-(game.distance%game.distanceForLevelUpdate)/game.distanceForLevelUpdate);
   levelCircle.setAttribute("stroke-dashoffset", d);
-
 }
 
 var blinkEnergy=false;
-
+//更新能量及状态
 function updateEnergy(){
   game.energy -= game.speed*deltaTime*game.ratioSpeedEnergy;
   game.energy = Math.max(0, game.energy);
@@ -692,34 +585,33 @@ function removeEnergy(){
   game.energy -= game.ennemyValue;
   game.energy = Math.max(0, game.energy);
 }
-
+//更新小人状态
 function updateModel(){
 
-  game.planeSpeed = normalize(mousePos.x,-.5,.5,game.planeMinSpeed, game.planeMaxSpeed);
-  var targetY = normalize(mousePos.y,-.75,.75,game.planeDefaultHeight-game.planeAmpHeight, game.planeDefaultHeight+game.planeAmpHeight);
-  var targetX = normalize(mousePos.x,-1,1,-game.planeAmpWidth*.7, -game.planeAmpWidth);
+  game.modelSpeed = normalize(mousePos.x,-.5,.5,game.modelMinSpeed, game.modelMaxSpeed);
+  var targetY = normalize(mousePos.y,-.75,.75,game.modelDefaultHeight-game.modelAmpHeight, game.modelDefaultHeight+game.modelAmpHeight);
+  var targetX = normalize(mousePos.x,-1,1,-game.modelAmpWidth*.7, -game.modelAmpWidth);
 
-  game.planeCollisionDisplacementX += game.planeCollisionSpeedX;
-  targetX += game.planeCollisionDisplacementX;
+  game.modelCollisionDisplacementX += game.modelCollisionSpeedX;
+  targetX += game.modelCollisionDisplacementX;
 
 
-  game.planeCollisionDisplacementY += game.planeCollisionSpeedY;
-  targetY += game.planeCollisionDisplacementY;
+  game.modelCollisionDisplacementY += game.modelCollisionSpeedY;
+  targetY += game.modelCollisionDisplacementY;
 
-  model.position.y += (targetY-model.position.y)*deltaTime*game.planeMoveSensivity;
-  model.position.x += (targetX-model.position.x)*deltaTime*game.planeMoveSensivity;
+  model.position.y += (targetY-model.position.y)*deltaTime*game.modelMoveSensivity;
+  model.position.x += (targetX-model.position.x)*deltaTime*game.modelMoveSensivity;
 
-  model.rotation.z = (targetY-model.position.y)*deltaTime*game.planeRotXSensivity;
-  model.rotation.x = (model.position.y-targetY)*deltaTime*game.planeRotZSensivity;
-  var targetCameraZ = normalize(game.planeSpeed, game.planeMinSpeed, game.planeMaxSpeed, game.cameraNearPos, game.cameraFarPos);
-  camera.fov = normalize(mousePos.x,-1,1,40, 80);
-  camera.updateProjectionMatrix ()
-  camera.position.y += (model.position.y - camera.position.y)*deltaTime*game.cameraSensivity;
-
-  game.planeCollisionSpeedX += (0-game.planeCollisionSpeedX)*deltaTime * 0.03;
-  game.planeCollisionDisplacementX += (0-game.planeCollisionDisplacementX)*deltaTime *0.01;
-  game.planeCollisionSpeedY += (0-game.planeCollisionSpeedY)*deltaTime * 0.03;
-  game.planeCollisionDisplacementY += (0-game.planeCollisionDisplacementY)*deltaTime *0.01;
+  model.rotation.z = (targetY-model.position.y)*deltaTime*game.modelRotXSensivity;
+  model.rotation.x = (model.position.y-targetY)*deltaTime*game.modelRotZSensivity;
+  // var targetCameraZ = normalize(game.modelSpeed, game.modelMinSpeed, game.modelMaxSpeed, game.cameraNearPos, game.cameraFarPos);
+  // camera.fov = normalize(mousePos.x,-1,1,40, 80);
+  // camera.updateProjectionMatrix ()
+  // camera.position.y += (model.position.y - camera.position.y)*deltaTime*game.cameraSensivity;
+  game.modelCollisionSpeedX += (0-game.modelCollisionSpeedX)*deltaTime * 0.03;
+  game.modelCollisionDisplacementX += (0-game.modelCollisionDisplacementX)*deltaTime *0.01;
+  game.modelCollisionSpeedY += (0-game.modelCollisionSpeedY)*deltaTime * 0.03;
+  game.modelCollisionDisplacementY += (0-game.modelCollisionDisplacementY)*deltaTime *0.01;
 
 }
 
@@ -741,37 +633,32 @@ function normalize(v,vmin,vmax,tmin, tmax){
 }
 
 var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle;
-
+//初始化
 function init(event){
 
-  // UI
-
+  //绑定显示
   fieldDistance = document.getElementById("distValue");
   energyBar = document.getElementById("energyBar");
   replayMessage = document.getElementById("replayMessage");
   fieldLevel = document.getElementById("levelValue");
   levelCircle = document.getElementById("levelCircleStroke");
-
+  //初始化游戏参数、场景、灯光，加载模型及地球
   resetGame();
   createScene();
-
   createLights();
   createModelAndEnvironment();
-  //createEnvironment();
-  //createSea();
-  //createSky();
-
-
+  //绑定鼠标操作
   document.addEventListener('mousemove', handleMouseMove, false);
   document.addEventListener('touchmove', handleTouchMove, false);
   document.addEventListener('mouseup', handleMouseUp, false);
   document.addEventListener('touchend', handleTouchEnd, false);
-
+  //获取时钟，便于后期做随机
   clock = new THREE.Clock();
 
 }
-
+// 旋转地球
 function updateEnvironment(){
+
   floorRotation += delta*.03 * speed;
   floorRotation = floorRotation%(Math.PI*2);
   environment.rotation.z = floorRotation;

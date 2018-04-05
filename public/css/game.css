@@ -2,8 +2,8 @@
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	background: -webkit-linear-gradient(#e4e0ba, #f7d9aa);
-	background: linear-gradient(#e4e0ba, #f7d9aa);
+	/* background: -webkit-linear-gradient(#e4e0ba, #f7d9aa);
+	background: linear-gradient(#e4e0ba, #f7d9aa); */
 }
 
 .world {
@@ -18,6 +18,7 @@
 	/*top: 8vh;*/
 	left: 0;
 	width: 100%;
+	z-index: 999;
 	text-align: center;
 	pointer-events: none;
 }
@@ -71,7 +72,7 @@
 .score__label {
 	font-size: 9px;
 	position: relative;
-	margin: 0 0 0.5em 0;
+	margin: 0 0 1em 0;
 	text-align: center;
 	letter-spacing: 3px;
 	text-transform: uppercase;
@@ -96,7 +97,7 @@
 	position: absolute;
 	left: 50%;
 	width: 46px;
-	margin: -37px 0 0 -23px;
+	margin: -40px 0 0 -23px;
 	-webkit-transform: rotate(-90deg);
 	transform: rotate(-90deg);
 }
