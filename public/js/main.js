@@ -79,6 +79,7 @@ function resetGame(){
           status : "playing",
          };
   if(ambientLight) ambientLight.intensity = 0.5;
+  if(hemisphereLight) hemisphereLight.intensity = 0.9;
   fieldLevel.innerHTML = Math.floor(game.level);
 }
 
@@ -158,6 +159,7 @@ function handleTouchMove(event) {
 function handleMouseUp(event){
   if (game.status == "waitingReplay"){
     resetGame();
+    //document.getElementById('gameHolder').style.opacity +=0.1;
     hideReplay();
   }
 }
@@ -180,7 +182,7 @@ function createLights() {
 
   ambientLight = new THREE.AmbientLight(0xdc8874, .5);
 
-  shadowLight = new THREE.DirectionalLight(0xffffff, .3);
+  shadowLight = new THREE.DirectionalLight(0xffffff, .2);
   shadowLight.position.set(150, 350, 350);
   shadowLight.castShadow = true;
   shadowLight.shadow.camera.left = -400;
@@ -196,7 +198,7 @@ function createLights() {
 
   //scene.add(ch);
   scene.add(hemisphereLight);
-  scene.add(shadowLight);
+  //scene.add(shadowLight);
   scene.add(ambientLight);
 
 }
@@ -231,12 +233,12 @@ function resourceFectch(mtlStr, objStr) {
 //3d model3  小人、地球
 
 var model, environment;
+
 //加载模型
 function createModelAndEnvironment(){
   var promiseModel = resourceFectch('resource/modelFly.mtl', 'resource/modelFly.obj');
   var promiseEnvironment = resourceFectch('resource/environment.mtl', 'resource/environment.obj');
   Promise.all([promiseModel, promiseEnvironment]).then(function(values) {
-     console.log(values);
      model = values[0];
      model.scale.set(.1,.1,.1);
      model.castShadow = true;
@@ -249,12 +251,7 @@ function createModelAndEnvironment(){
      environment.position.z = -10;
      scene.add(environment);
 
-     //创建金币、障碍物、障碍物分解物
-     createCoins();
-     createEnnemies();
-     createParticles();
-     //循环游戏
-     loop();
+    //
  });
 }
 Ennemy = function(){
@@ -513,6 +510,13 @@ function loop(){
     if (Math.floor(game.distance)%game.distanceForLevelUpdate == 0 && Math.floor(game.distance) > game.levelLastUpdate){
       game.levelLastUpdate = Math.floor(game.distance);
       game.level++;
+      //升级
+      messageDiv.innerHTML="恭喜您已通过第"+game.level+"关！";
+      messageDiv.style.display="block";
+      setTimeout(function(){
+        messageDiv.style.display="none";
+      },3000);
+
       fieldLevel.innerHTML = Math.floor(game.level);
 
       game.targetBaseSpeed = game.initSpeed + game.incrementSpeedByLevel*game.level
@@ -545,7 +549,8 @@ function loop(){
   //ambientLight.intensity += (.5 - ambientLight.intensity)*deltaTime*0.005;
   coinsHolder.rotateCoins();
   ennemiesHolder.rotateEnnemies();
-  ambientLight.intensity-=0.0002;
+  if(ambientLight.intensity>0.1) ambientLight.intensity-=0.001;
+  if(ambientLight.intensity>0.1) hemisphereLight.intensity-=0.0001;
   renderer.render(scene, camera);
   requestAnimationFrame(loop);
 }
@@ -632,7 +637,7 @@ function normalize(v,vmin,vmax,tmin, tmax){
   return tv;
 }
 
-var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle;
+var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle,messageDiv;
 //初始化
 function init(event){
 
@@ -642,11 +647,12 @@ function init(event){
   replayMessage = document.getElementById("replayMessage");
   fieldLevel = document.getElementById("levelValue");
   levelCircle = document.getElementById("levelCircleStroke");
+  messageDiv = document.getElementById("messageDiv");
   //初始化游戏参数、场景、灯光，加载模型及地球
   resetGame();
   createScene();
-  createLights();
   createModelAndEnvironment();
+  createLights();
   //绑定鼠标操作
   document.addEventListener('mousemove', handleMouseMove, false);
   document.addEventListener('touchmove', handleTouchMove, false);
@@ -660,9 +666,25 @@ function init(event){
 function updateEnvironment(){
 
   floorRotation += delta*.03 * speed;
+  if(floorRotation>Math.PI*2){
+    console.log('complete one circle.');
+    //完成一周，光线变化一次
+    if(ambientLight) ambientLight.intensity = 0.5;
+    if(hemisphereLight) hemisphereLight.intensity = 0.9;
+  }
   floorRotation = floorRotation%(Math.PI*2);
   environment.rotation.z = floorRotation;
 }
 
+function readyGo(){
+  //创建金币、障碍物、障碍物分解物
+  createCoins();
+  createEnnemies();
+  createParticles();
+  //隐藏掉弹出层
+  document.getElementById("welcome").style.display="none";
+  //循环游戏
+  loop();
+}
 
 window.addEventListener('load', init, false);

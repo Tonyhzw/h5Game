@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>h5 games for dxj</title>
+		<title>戴晓静的h5小游戏</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="stylesheet" type="text/css" href="css/demo.css" />
@@ -25,11 +25,37 @@
 				display:block;
 			}
 			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			.modal{
+				position: absolute;
+				z-index: 9999;
+				width:100%;
+				height:100%;
+				background-color: rgba(0,0,0,0.8);
+			}
+			.content{
+				padding-top: 25%;
+    		text-align: center;
+			}
+			.text{
+				display: block;
+    		margin-bottom: 80px;
+			}
+			.content input{
+				box-sizing: content-box;
+				padding: 10px;
+				border-radius: 2px;
+			}
 		</style>
 	</head>
 
 	<body>
 		<div class="game-holder" id="gameHolder">
+			<div class="modal" id="welcome">
+				<div class="content">
+					<span class="text">欢迎来到戴晓静的h5小游戏！</span>
+					<input type="button" value="Go" onclick="readyGo();"/>
+				</div>
+			</div>
 			<div class="header">
 				<div class="score" id="score">
 					<div class="score__content" id="level">
@@ -53,6 +79,7 @@
 				</div>
 			</div>
 			<div class="world" id="world"></div>
+			<div class="message" id="messageDiv" style="display:none;top:50%;">	</div>
 			<div class="message message--replay" id="replayMessage">再来一局</div>
 			<div class="message message--instructions" id="instructions">蓝色的补充能量<span>红色减少能量</span></div>
 		</div>
