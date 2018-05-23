@@ -419,7 +419,7 @@ CoinsHolder = function (nCoins){
     this.coinsPool.push(coin);
   }
 }
-
+//产生金币
 CoinsHolder.prototype.spawnCoins = function(){
 
   var nCoins = 1 + Math.floor(Math.random()*10);
@@ -453,6 +453,8 @@ CoinsHolder.prototype.rotateCoins = function(){
     coin.mesh.rotation.y += Math.random()*.1;
 
     //var globalCoinPosition =  coin.mesh.localToWorld(new THREE.Vector3());
+    // console.dir(model);
+    // console.dir(model.position);
     var diffPos = model.position.clone().sub(coin.mesh.position.clone());
     var d = diffPos.length();
     if (d<game.coinDistanceTolerance){
