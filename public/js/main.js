@@ -80,6 +80,7 @@ function resetGame(){
          };
   if(ambientLight) ambientLight.intensity = 0.5;
   if(hemisphereLight) hemisphereLight.intensity = 0.9;
+  //backgroundColor.style.backgroundColor="#fff";
   fieldLevel.innerHTML = Math.floor(game.level);
 }
 
@@ -157,13 +158,16 @@ function handleTouchMove(event) {
 }
 
 function handleMouseUp(event){
-  if (game.status == "waitingReplay"){
-    resetGame();
-    //document.getElementById('gameHolder').style.opacity +=0.1;
-    hideReplay();
-  }
+  // if (game.status == "waitingReplay"){
+  //   resetGame();
+  //   //document.getElementById('gameHolder').style.opacity +=0.1;
+  //   hideReplay();
+  // }
 }
-
+function restart(){
+  resetGame();
+  hideReplay();
+}
 
 function handleTouchEnd(event){
   if (game.status == "waitingReplay"){
@@ -237,7 +241,7 @@ var model, environment;
 //加载模型
 function createModelAndEnvironment(){
   var promiseModel = resourceFectch('resource/modelFly.mtl', 'resource/modelFly.obj');
-  var promiseEnvironment = resourceFectch('resource/environment.mtl', 'resource/environment.obj');
+  var promiseEnvironment = resourceFectch('resource/h5model5.mtl', 'resource/h5model5.obj');
   Promise.all([promiseModel, promiseEnvironment]).then(function(values) {
      model = values[0];
      model.scale.set(.1,.1,.1);
@@ -246,12 +250,22 @@ function createModelAndEnvironment(){
      scene.add(model);
 
      environment = values[1];
-     environment.scale.set(.5,.5,.5);
-     environment.position.y = game.modelDefaultHeight -200;
-     environment.position.z = -10;
+     //environment.scale.set(.5,.5,.5);
+     environment.position.x = 10;
+     environment.position.y = game.modelDefaultHeight -180;
+     //environment.position.z = -10;
+     //environment.position.z *=-1;
+     environment.castShadow = true;
+     environment.receiveShadow = true;
      scene.add(environment);
 
-    //
+     //创建金币、障碍物、障碍物分解物
+     createCoins();
+     createEnnemies();
+     createParticles();
+
+     //循环游戏
+     loop();
  });
 }
 Ennemy = function(){
@@ -511,7 +525,20 @@ function loop(){
       game.levelLastUpdate = Math.floor(game.distance);
       game.level++;
       //升级
-      messageDiv.innerHTML="恭喜您已通过第"+game.level+"关！";
+      //messageDiv.innerHTML="恭喜您已通过第"+(game.level-1)+"关！";
+      var curLevel = game.level-1,numImg=[],innerStr="";
+      while(curLevel>=10){
+        numImg.unshift(curLevel%10);
+        curLevel=curLevel/10;
+      }
+      numImg.unshift(curLevel);
+
+      innerStr="<img src='../design/tips_1.png'/>"
+      for(var i=0;i<numImg.length;i++){
+        innerStr+="<img src='../design/number/"+numImg[i]+".png'/>";
+      }
+      innerStr+="<img src='../design/tips_3.png'/>";
+      messageDiv.innerHTML=innerStr;
       messageDiv.style.display="block";
       setTimeout(function(){
         messageDiv.style.display="none";
@@ -549,8 +576,9 @@ function loop(){
   //ambientLight.intensity += (.5 - ambientLight.intensity)*deltaTime*0.005;
   coinsHolder.rotateCoins();
   ennemiesHolder.rotateEnnemies();
-  if(ambientLight.intensity>0.1) ambientLight.intensity-=0.001;
-  if(ambientLight.intensity>0.1) hemisphereLight.intensity-=0.0001;
+  //if(ambientLight.intensity>0.1) ambientLight.intensity-=0.0001;
+  //if(ambientLight.intensity>0.1) hemisphereLight.intensity-=0.0001;
+  //backgroundColor.style.opacity+=0.001;
   renderer.render(scene, camera);
   requestAnimationFrame(loop);
 }
@@ -578,6 +606,15 @@ function updateEnergy(){
 
   if (game.energy <1){
     game.status = "gameover";
+    //提示游戏结束
+    //升级
+    var percent=0;
+    if(game.level-1<1) percent=10+Math.random()*9;
+    else if (game.level-1<3) percent=60+Math.random()*9;
+    else percent=Math.random()*20+80;
+    endStr.innerHTML="成功超越了"+Math.ceil(percent)+"%的玩家！";
+    distanceDiv.innerHTML=Math.ceil(game.distance);
+    //document.getElementById('replayMessage').innerHTML="恭喜您已通过第"+(game.level-1)+"关，飞行了"+Math.ceil(game.distance)+"米!<br/><br><br/>"+"再来一局";
   }
 }
 
@@ -637,7 +674,7 @@ function normalize(v,vmin,vmax,tmin, tmax){
   return tv;
 }
 
-var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle,messageDiv;
+var fieldDistance, energyBar, replayMessage, fieldLevel, levelCircle,messageDiv,backgroundColor,distanceDiv,endStrDiv;
 //初始化
 function init(event){
 
@@ -648,6 +685,9 @@ function init(event){
   fieldLevel = document.getElementById("levelValue");
   levelCircle = document.getElementById("levelCircleStroke");
   messageDiv = document.getElementById("messageDiv");
+  endStrDiv = document.getElementById("endStr");
+  distanceDiv = document.getElementById("distance");
+  backgroundColor = document.getElementsByClassName("game-holder")[0];
   //初始化游戏参数、场景、灯光，加载模型及地球
   resetGame();
   createScene();
@@ -660,7 +700,8 @@ function init(event){
   document.addEventListener('touchend', handleTouchEnd, false);
   //获取时钟，便于后期做随机
   clock = new THREE.Clock();
-
+  //用于暂停游戏
+  game.status="waitingReplay";
 }
 // 旋转地球
 function updateEnvironment(){
@@ -671,20 +712,18 @@ function updateEnvironment(){
     //完成一周，光线变化一次
     if(ambientLight) ambientLight.intensity = 0.5;
     if(hemisphereLight) hemisphereLight.intensity = 0.9;
+    //backgroundColor.style.backgroundColor="#fff";
   }
   floorRotation = floorRotation%(Math.PI*2);
   environment.rotation.z = floorRotation;
 }
 
 function readyGo(){
-  //创建金币、障碍物、障碍物分解物
-  createCoins();
-  createEnnemies();
-  createParticles();
   //隐藏掉弹出层
+  game.status="playing";
   document.getElementById("welcome").style.display="none";
-  //循环游戏
-  loop();
 }
-
+function share(){
+  alert("该功能已下线！");
+}
 window.addEventListener('load', init, false);

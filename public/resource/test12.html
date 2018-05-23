@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>戴晓静的h5小游戏</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="css/demo.css" />
+		<link rel="stylesheet" type="text/css" href="css/game.css" />
+		<script type="text/javascript" src="js/TweenMax.min.js"></script>
+		<style>
+			body {
+				font-family: Monospace;
+				/* background-color: #000; */
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			.modal{
+				position: absolute;
+				z-index: 9999;
+				width:100%;
+				height:100%;
+				background-color: rgba(0,0,0,0.8);
+			}
+			.content{
+				padding-top: 25%;
+    		text-align: center;
+			}
+			.text{
+				display: block;
+    		margin-bottom: 80px;
+			}
+			.content input{
+				box-sizing: content-box;
+				padding: 10px;
+				border-radius: 2px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="game-holder" id="gameHolder">
+			<div class="modal" id="welcome">
+				<div class="content">
+					<span class="text">欢迎来到戴晓静的h5小游戏！</span>
+					<input type="button" value="Go" onclick="readyGo();"/>
+				</div>
+			</div>
+			<div class="header">
+				<div class="score" id="score">
+					<div class="score__content" id="level">
+						<div class="score__label">关数</div>
+						<div class="score__value score__value--level" id="levelValue">1</div>
+						<svg class="level-circle" id="levelCircle" viewbox="0 0 200 200">
+								<circle id="levelCircleBgr" r="80" cx="100" cy="100" fill="none" stroke="#d1b790" stroke-width="24px" />
+								<circle id="levelCircleStroke" r="80" cx="100" cy="100" fill="none" #f25346 stroke="#68c3c0" stroke-width="14px" stroke-dasharray="502" />
+							</svg>
+					</div>
+					<div class="score__content" id="dist">
+						<div class="score__label">飞行距离</div>
+						<div class="score__value score__value--dist" id="distValue">000</div>
+					</div>
+					<div class="score__content" id="energy">
+						<div class="score__label">剩余能量</div>
+						<div class="score__value score__value--energy" id="energyValue">
+							<div class="energy-bar" id="energyBar"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="world" id="world"></div>
+			<div class="message" id="messageDiv" style="display:none;top:50%;">	</div>
+			<div class="message message--replay" id="replayMessage">再来一局</div>
+			<div class="message message--instructions" id="instructions">蓝色的补充能量<span>红色减少能量</span></div>
+		</div>
+		<script src="js/three.js"></script>
+
+		<script src="js/DDSLoader.js"></script>
+		<script src="js/MTLLoader.js"></script>
+		<script src="js/OBJLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/stats.min.js"></script>
+	  <script src="js/main.js"></script>
+
+	</body>
+</html>
